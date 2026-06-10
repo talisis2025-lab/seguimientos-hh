@@ -1,0 +1,741 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ranking Uber Monterrey | Top sin eléctricos</title>
+  <meta name="description" content="Análisis visual de rentabilidad para operar Uber en Monterrey: híbridos sí, eléctricos puros no." />
+  <style>
+    :root{
+      --bg:#05060a;
+      --card:rgba(255,255,255,.08);
+      --card-strong:rgba(255,255,255,.14);
+      --stroke:rgba(255,255,255,.18);
+      --stroke-soft:rgba(255,255,255,.1);
+      --text:#f7f7fb;
+      --muted:rgba(247,247,251,.68);
+      --muted2:rgba(247,247,251,.45);
+      --green:#4df4a4;
+      --blue:#7fc7ff;
+      --purple:#b491ff;
+      --yellow:#ffd76a;
+      --red:#ff7d86;
+      --shadow: 0 24px 80px rgba(0,0,0,.55);
+      --radius: 28px;
+      --radius-sm: 18px;
+      --max: 1180px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",Inter,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+      background:
+        radial-gradient(circle at 18% 8%, rgba(127,199,255,.24), transparent 34%),
+        radial-gradient(circle at 82% 2%, rgba(180,145,255,.26), transparent 30%),
+        radial-gradient(circle at 50% 80%, rgba(77,244,164,.12), transparent 34%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    body::before{
+      content:"";
+      position:fixed;
+      inset:-25vh -20vw;
+      background:
+        conic-gradient(from 180deg at 50% 50%, rgba(77,244,164,.12), rgba(127,199,255,.12), rgba(180,145,255,.14), rgba(255,215,106,.08), rgba(77,244,164,.12));
+      filter:blur(80px);
+      opacity:.72;
+      animation:aurora 18s ease-in-out infinite alternate;
+      z-index:-3;
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+      background-size:52px 52px;
+      mask-image:linear-gradient(to bottom, black, transparent 90%);
+      z-index:-2;
+      pointer-events:none;
+    }
+
+    @keyframes aurora{
+      0%{transform:translate3d(-2%, -1%, 0) rotate(0deg) scale(1)}
+      100%{transform:translate3d(2%, 3%, 0) rotate(18deg) scale(1.08)}
+    }
+
+    a{color:inherit;text-decoration:none}
+    .wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+
+    .nav{
+      position:fixed;
+      top:18px;
+      left:50%;
+      transform:translateX(-50%);
+      z-index:50;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      padding:8px;
+      border:1px solid var(--stroke);
+      background:rgba(16,18,26,.62);
+      backdrop-filter: blur(24px) saturate(160%);
+      box-shadow:0 18px 44px rgba(0,0,0,.28);
+      border-radius:999px;
+      max-width:calc(100vw - 24px);
+    }
+    .nav a{
+      font-size:13px;
+      color:rgba(255,255,255,.78);
+      padding:10px 13px;
+      border-radius:999px;
+      white-space:nowrap;
+      transition:.25s ease;
+    }
+    .nav a:hover{background:rgba(255,255,255,.11);color:white}
+    .nav .pill{
+      background:linear-gradient(135deg, rgba(77,244,164,.22), rgba(127,199,255,.18));
+      color:white;
+      border:1px solid rgba(255,255,255,.1);
+    }
+
+    .hero{
+      min-height:100vh;
+      display:grid;
+      align-items:center;
+      padding:120px 0 70px;
+      position:relative;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.02fr .98fr;
+      gap:38px;
+      align-items:center;
+    }
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:9px;
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.07);
+      color:rgba(255,255,255,.78);
+      font-size:13px;
+      letter-spacing:.1px;
+      backdrop-filter: blur(20px);
+      animation:floatIn .7s cubic-bezier(.2,.9,.2,1) both;
+    }
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 18px var(--green)}
+    h1{
+      font-size:clamp(46px,8vw,92px);
+      line-height:.92;
+      letter-spacing:-.07em;
+      margin:22px 0 18px;
+      max-width:900px;
+      animation:floatIn .9s .08s cubic-bezier(.2,.9,.2,1) both;
+    }
+    .grad{
+      background:linear-gradient(120deg, #fff 8%, #b8e4ff 40%, #d4c1ff 66%, #a8ffd1 92%);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+    .subtitle{
+      color:var(--muted);
+      font-size:clamp(18px,2.2vw,24px);
+      line-height:1.48;
+      max-width:710px;
+      margin:0 0 28px;
+      animation:floatIn .9s .16s cubic-bezier(.2,.9,.2,1) both;
+    }
+    .hero-actions{display:flex;gap:12px;flex-wrap:wrap;animation:floatIn .9s .24s cubic-bezier(.2,.9,.2,1) both;}
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      min-height:48px;
+      padding:13px 18px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.1);
+      backdrop-filter:blur(18px);
+      color:white;
+      font-weight:650;
+      box-shadow:0 10px 34px rgba(0,0,0,.25);
+      transition:transform .25s ease, background .25s ease;
+    }
+    .btn:hover{transform:translateY(-2px);background:rgba(255,255,255,.15)}
+    .btn.primary{background:linear-gradient(135deg, rgba(77,244,164,.95), rgba(127,199,255,.92));color:#07100f;border:0}
+
+    .hero-visual{
+      position:relative;
+      min-height:560px;
+      animation:floatIn 1s .18s cubic-bezier(.2,.9,.2,1) both;
+    }
+    .phone{
+      width:min(390px,86vw);
+      height:760px;
+      max-height:76vh;
+      min-height:570px;
+      margin:0 auto;
+      border-radius:54px;
+      border:1px solid rgba(255,255,255,.18);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.18), rgba(255,255,255,.05)),
+        rgba(14,17,25,.78);
+      box-shadow:0 40px 120px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.25);
+      padding:14px;
+      backdrop-filter:blur(24px) saturate(160%);
+      position:relative;
+      overflow:hidden;
+      transform:rotate(2deg);
+    }
+    .phone::before{
+      content:"";
+      position:absolute;
+      top:12px;left:50%;transform:translateX(-50%);
+      width:120px;height:34px;border-radius:999px;
+      background:#05060a;
+      z-index:2;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.08);
+    }
+    .screen{
+      height:100%;
+      border-radius:42px;
+      overflow:hidden;
+      background:
+        radial-gradient(circle at 30% 10%, rgba(77,244,164,.22), transparent 34%),
+        linear-gradient(180deg, #111520, #080a0f 72%);
+      padding:58px 18px 18px;
+      position:relative;
+    }
+    .mini-status{display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.72);font-size:12px;margin-bottom:18px}
+    .winner-card{
+      border:1px solid var(--stroke);
+      border-radius:30px;
+      background:rgba(255,255,255,.1);
+      padding:22px;
+      box-shadow:var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+    .winner-card::after{
+      content:"";
+      position:absolute;inset:auto -30% -46% -30%;height:150px;
+      background:radial-gradient(circle, rgba(77,244,164,.4), transparent 62%);
+      filter:blur(28px);
+    }
+    .winner-top{display:flex;justify-content:space-between;gap:16px;align-items:start}
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:12px;color:rgba(255,255,255,.82);
+      border:1px solid rgba(255,255,255,.18);
+      background:rgba(255,255,255,.08);
+      padding:8px 10px;border-radius:999px;
+    }
+    .score-ring{
+      width:86px;height:86px;border-radius:50%;
+      background:conic-gradient(var(--green) 0 93%, rgba(255,255,255,.1) 93% 100%);
+      display:grid;place-items:center;
+      box-shadow:0 0 34px rgba(77,244,164,.2);
+    }
+    .score-ring div{width:66px;height:66px;border-radius:50%;background:#111520;display:grid;place-items:center;font-weight:800;font-size:22px}
+    .winner-card h2{font-size:31px;letter-spacing:-.04em;margin:22px 0 8px}
+    .winner-card p{color:var(--muted);line-height:1.5;margin:0 0 18px}
+    .car-art{width:100%;margin:12px 0 0;filter:drop-shadow(0 24px 28px rgba(0,0,0,.35));animation:carFloat 5s ease-in-out infinite alternate}
+    @keyframes carFloat{from{transform:translateY(3px)}to{transform:translateY(-12px)}}
+    .mini-list{display:grid;gap:10px;margin-top:14px}
+    .mini-row{display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.055);border-radius:16px;padding:12px;color:rgba(255,255,255,.82);font-size:13px}
+    .mini-row b{color:white}
+
+    @keyframes floatIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+    section{padding:84px 0}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:24px;margin-bottom:26px}
+    .kicker{color:var(--green);font-weight:750;font-size:13px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+    h3{font-size:clamp(32px,5vw,58px);line-height:.98;letter-spacing:-.055em;margin:0;max-width:760px}
+    .section-head p{max-width:420px;margin:0;color:var(--muted);line-height:1.5}
+
+    .cards{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+    .card{
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.11), rgba(255,255,255,.055));
+      backdrop-filter:blur(24px) saturate(150%);
+      box-shadow:0 20px 70px rgba(0,0,0,.28);
+      padding:22px;
+      position:relative;
+      overflow:hidden;
+      transform:translateY(20px);
+      opacity:0;
+      transition:transform .7s cubic-bezier(.2,.9,.2,1), opacity .7s ease, border-color .3s ease;
+    }
+    .card.reveal{transform:translateY(0);opacity:1}
+    .card:hover{border-color:rgba(255,255,255,.28)}
+    .card::before{
+      content:"";position:absolute;inset:-1px;border-radius:inherit;padding:1px;
+      background:linear-gradient(135deg, rgba(255,255,255,.25), transparent 40%, rgba(77,244,164,.15));
+      mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);mask-composite:exclude;opacity:.7;pointer-events:none;
+    }
+    .metric{font-size:42px;font-weight:850;letter-spacing:-.05em;margin:10px 0 4px}
+    .metric small{font-size:16px;color:var(--muted);font-weight:700}
+    .card p{color:var(--muted);line-height:1.55;margin:8px 0 0}
+    .icon{
+      width:48px;height:48px;border-radius:16px;
+      display:grid;place-items:center;
+      background:linear-gradient(135deg, rgba(77,244,164,.24), rgba(127,199,255,.12));
+      border:1px solid rgba(255,255,255,.14);
+      font-size:23px;
+    }
+
+    .ranking{
+      display:grid;
+      gap:13px;
+    }
+    .rank-row{
+      display:grid;
+      grid-template-columns:64px 1.25fr .76fr .95fr 100px;
+      gap:14px;
+      align-items:center;
+      padding:16px;
+      border:1px solid var(--stroke-soft);
+      border-radius:24px;
+      background:rgba(255,255,255,.065);
+      backdrop-filter:blur(20px);
+      box-shadow:0 15px 44px rgba(0,0,0,.20);
+      transform:translateX(-16px);
+      opacity:0;
+      transition:.7s cubic-bezier(.2,.9,.2,1);
+    }
+    .rank-row.reveal{transform:translateX(0);opacity:1}
+    .rank-row.top{background:linear-gradient(135deg, rgba(77,244,164,.18), rgba(127,199,255,.09));border-color:rgba(77,244,164,.34)}
+    .num{
+      width:46px;height:46px;border-radius:16px;display:grid;place-items:center;
+      background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.13);
+      font-weight:850;
+    }
+    .rank-row.top .num{background:linear-gradient(135deg, var(--green), var(--blue));color:#07100f;border:0}
+    .car-name{font-weight:800;font-size:18px;letter-spacing:-.02em}
+    .car-note{color:var(--muted);font-size:13px;margin-top:4px;line-height:1.35}
+    .tags{display:flex;gap:7px;flex-wrap:wrap}
+    .tag{font-size:12px;color:rgba(255,255,255,.82);border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.07);border-radius:999px;padding:7px 9px}
+    .tag.hot{color:#07100f;background:var(--green);border:0;font-weight:800}
+    .bar{height:10px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden;border:1px solid rgba(255,255,255,.07)}
+    .bar span{display:block;height:100%;width:var(--w);background:linear-gradient(90deg,var(--green),var(--blue));border-radius:inherit;animation:grow 1.2s cubic-bezier(.2,.9,.2,1) both}
+    @keyframes grow{from{width:0}to{width:var(--w)}}
+    .score{font-weight:850;text-align:right;font-size:18px}
+    .score small{display:block;color:var(--muted2);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;margin-top:3px}
+
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .panel{
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      padding:26px;
+      background:rgba(255,255,255,.07);
+      backdrop-filter:blur(24px);
+      box-shadow:0 24px 70px rgba(0,0,0,.24);
+      position:relative;overflow:hidden;
+    }
+    .panel h4{font-size:25px;letter-spacing:-.035em;margin:0 0 10px}
+    .panel p{color:var(--muted);line-height:1.55;margin:0 0 18px}
+    .logic-list{display:grid;gap:12px;margin-top:16px}
+    .logic-item{display:grid;grid-template-columns:38px 1fr;gap:12px;align-items:start;padding:14px;border-radius:18px;background:rgba(255,255,255,.055);border:1px solid rgba(255,255,255,.1)}
+    .logic-item .mini-icon{width:38px;height:38px;border-radius:14px;display:grid;place-items:center;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.1)}
+    .logic-item b{display:block;margin-bottom:4px}
+    .logic-item span{display:block;color:var(--muted);font-size:14px;line-height:1.45}
+
+    .calc-grid{display:grid;grid-template-columns:.88fr 1.12fr;gap:16px;align-items:stretch}
+    .controls{display:grid;gap:14px}
+    label{display:grid;gap:8px;color:rgba(255,255,255,.86);font-weight:700;font-size:14px}
+    input,select{
+      width:100%;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.08);color:white;border-radius:16px;padding:14px 14px;font-size:15px;outline:0;
+    }
+    select option{background:#111520;color:white}
+    input:focus,select:focus{border-color:rgba(127,199,255,.55);box-shadow:0 0 0 4px rgba(127,199,255,.12)}
+    .calc-results{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .result-box{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.065);border-radius:22px;padding:18px}
+    .result-box .label{color:var(--muted);font-size:13px;margin-bottom:8px}
+    .result-box .value{font-size:32px;font-weight:850;letter-spacing:-.04em}
+    .result-box .hint{color:var(--muted2);font-size:12px;margin-top:6px;line-height:1.4}
+
+    .ios-image-board{
+      display:grid;grid-template-columns:1.2fr .8fr;gap:16px;margin-top:16px;
+    }
+    .image-card{
+      min-height:310px;
+      border-radius:32px;
+      border:1px solid var(--stroke);
+      background:linear-gradient(160deg, rgba(255,255,255,.12), rgba(255,255,255,.055));
+      overflow:hidden;position:relative;box-shadow:var(--shadow);
+    }
+    .image-card svg{width:100%;height:100%;display:block}
+    .floating-chip{
+      position:absolute;
+      left:18px;bottom:18px;
+      padding:11px 13px;border-radius:999px;background:rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(16px);font-weight:800;font-size:13px;
+    }
+    .image-stack{display:grid;gap:16px}
+    .small-img{min-height:147px}
+
+    .notes{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    .note{padding:18px;border-radius:22px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:var(--muted);line-height:1.48}
+    .note b{color:white;display:block;margin-bottom:7px}
+
+    footer{padding:70px 0 48px;color:var(--muted);border-top:1px solid rgba(255,255,255,.08)}
+    .sources{display:grid;gap:10px;margin-top:16px}
+    .sources a{color:rgba(255,255,255,.84);text-decoration:underline;text-decoration-color:rgba(255,255,255,.25);text-underline-offset:4px}
+
+    .fineprint{font-size:12px;color:var(--muted2);line-height:1.5;margin-top:18px;max-width:900px}
+
+    @media (max-width: 980px){
+      .hero-grid,.split,.calc-grid,.ios-image-board{grid-template-columns:1fr}
+      .hero{padding-top:110px}
+      .hero-visual{min-height:auto}
+      .phone{height:650px;max-height:none;transform:none}
+      .cards,.notes{grid-template-columns:1fr}
+      .rank-row{grid-template-columns:50px 1fr;gap:12px}
+      .rank-row .tags,.rank-row .bar,.rank-row .score{grid-column:2}
+      .section-head{display:block}
+      .section-head p{margin-top:14px}
+      .nav{overflow:auto;max-width:calc(100vw - 18px)}
+      .nav::-webkit-scrollbar{display:none}
+    }
+    @media (max-width: 560px){
+      .wrap{padding:0 15px}
+      section{padding:64px 0}
+      h1{font-size:50px}
+      .phone{width:100%;min-height:610px;height:650px;border-radius:42px;padding:10px}
+      .screen{border-radius:34px;padding:54px 14px 14px}
+      .winner-card h2{font-size:27px}
+      .calc-results{grid-template-columns:1fr}
+      .nav a{font-size:12px;padding:9px 10px}
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+      .card,.rank-row{opacity:1;transform:none}
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav" aria-label="Navegación principal">
+    <a class="pill" href="#veredicto">Veredicto</a>
+    <a href="#ranking">Ranking</a>
+    <a href="#logica">Lógica</a>
+    <a href="#calculadora">Calculadora</a>
+    <a href="#riesgos">Riesgos</a>
+  </nav>
+
+  <main>
+    <header class="hero" id="top">
+      <div class="wrap hero-grid">
+        <div>
+          <div class="eyebrow"><span class="dot"></span> Monterrey · Uber · sin eléctricos puros</div>
+          <h1><span class="grad">Top realista</span> para meter auto a plataforma</h1>
+          <p class="subtitle">Ranking visual basado en costo por kilómetro, confiabilidad, categoría Uber posible, reventa y riesgo operativo. Híbridos sí; eléctricos puros quedan fuera de este comparativo.</p>
+          <div class="hero-actions">
+            <a class="btn primary" href="#ranking">Ver top completo →</a>
+            <a class="btn" href="#calculadora">Probar mis números</a>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-label="Visual del ganador">
+          <div class="phone">
+            <div class="screen">
+              <div class="mini-status"><span>9:41</span><span>ROI Mode</span></div>
+              <div class="winner-card">
+                <div class="winner-top">
+                  <div>
+                    <span class="badge">🏆 Ganador conservador</span>
+                    <h2>Toyota Corolla HEV</h2>
+                  </div>
+                  <div class="score-ring" aria-label="Puntaje 93"><div>93</div></div>
+                </div>
+                <p>La mejor mezcla de Comfort real, bajo consumo, reventa, refacciones y bajo riesgo mecánico para operación intensiva.</p>
+                <svg class="car-art" viewBox="0 0 760 250" role="img" aria-label="Ilustración de sedán híbrido">
+                  <defs>
+                    <linearGradient id="carG" x1="0" x2="1" y1="0" y2="1"><stop stop-color="#7fc7ff"/><stop offset=".55" stop-color="#eef8ff"/><stop offset="1" stop-color="#4df4a4"/></linearGradient>
+                    <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+                  </defs>
+                  <ellipse cx="375" cy="205" rx="310" ry="24" fill="rgba(0,0,0,.35)"/>
+                  <path d="M108 154c27-47 68-71 122-74l114-6c44-2 87 12 119 42l51 47 88 13c38 6 61 26 69 60H82c-4-35 5-62 26-82Z" fill="url(#carG)" opacity=".96" filter="url(#glow)"/>
+                  <path d="M254 92h83c36 0 69 12 96 36l33 29H206l48-65Z" fill="rgba(5,6,10,.64)"/>
+                  <path d="M273 105h58c29 0 53 8 75 26l18 15H239l34-41Z" fill="rgba(255,255,255,.13)"/>
+                  <circle cx="221" cy="201" r="38" fill="#05060a" stroke="rgba(255,255,255,.28)" stroke-width="8"/>
+                  <circle cx="221" cy="201" r="13" fill="#7fc7ff"/>
+                  <circle cx="563" cy="201" r="38" fill="#05060a" stroke="rgba(255,255,255,.28)" stroke-width="8"/>
+                  <circle cx="563" cy="201" r="13" fill="#7fc7ff"/>
+                  <path d="M608 165c24 5 39 12 49 25h-49Z" fill="rgba(255,255,255,.75)"/>
+                  <path d="M112 168h64" stroke="rgba(255,255,255,.5)" stroke-width="8" stroke-linecap="round"/>
+                </svg>
+                <div class="mini-list">
+                  <div class="mini-row"><span>Categoría fuerte</span><b>UberX + Comfort</b></div>
+                  <div class="mini-row"><span>Riesgo operativo</span><b>Bajo</b></div>
+                  <div class="mini-row"><span>Uso ideal</span><b>60 h/semana</b></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section id="veredicto">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="kicker">Veredicto ejecutivo</div>
+            <h3>El negocio no se gana por lujo. Se gana por costo neto por kilómetro.</h3>
+          </div>
+          <p>Para Monterrey, el auto ideal no es necesariamente el que cobra más por viaje. Es el que combina volumen, baja gasolina, poco taller y buena reventa.</p>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <div class="icon">🥇</div>
+            <div class="metric">Corolla <small>HEV</small></div>
+            <p>Ganador conservador. Sedán híbrido, categoría Comfort viable, reputación Toyota y menor riesgo para operar muchos kilómetros.</p>
+          </article>
+          <article class="card">
+            <div class="icon">🧠</div>
+            <div class="metric">XL <small>hack</small></div>
+            <p>Ertiga y Avanza no ganan por consumo puro; ganan si la demanda XL compensa con tarifas superiores y buena ocupación.</p>
+          </article>
+          <article class="card">
+            <div class="icon">⚠️</div>
+            <div class="metric">No inflar <small>categorías</small></div>
+            <p>Comfort exige sedán; Black exige lista específica. Hatchbacks y autos no listados deben tratarse como riesgo, no como ingreso seguro.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="ranking">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="kicker">Top sin eléctricos puros</div>
+            <h3>Ranking recomendado para operación intensiva en Monterrey</h3>
+          </div>
+          <p>Puntaje propio de rentabilidad: 35% costo/km, 25% confiabilidad, 15% categoría, 15% reventa, 10% riesgo operativo.</p>
+        </div>
+
+        <div class="ranking" id="rankingRows"></div>
+      </div>
+    </section>
+
+    <section id="logica">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="kicker">Por qué gana</div>
+            <h3>El Corolla HEV vence por consistencia, no por espectacularidad.</h3>
+          </div>
+          <p>En una operación de 300 km diarios, un error de confiabilidad o categoría puede destruir el margen aunque el coche prometa buen consumo.</p>
+        </div>
+        <div class="split">
+          <article class="panel">
+            <h4>Lectura financiera</h4>
+            <p>El Corolla HEV no necesita que todo salga perfecto para ser buen negocio. Tolera mejor gasolina cara, uso intensivo, calor, tráfico y reventa futura.</p>
+            <div class="logic-list">
+              <div class="logic-item"><div class="mini-icon">⛽</div><div><b>Bajo costo variable</b><span>Un híbrido eficiente protege el margen cuando sube la gasolina o aumenta el kilometraje diario.</span></div></div>
+              <div class="logic-item"><div class="mini-icon">🧰</div><div><b>Menos tiempo parado</b><span>La confiabilidad y disponibilidad de refacciones valen más que un TCO teórico demasiado optimista.</span></div></div>
+              <div class="logic-item"><div class="mini-icon">💼</div><div><b>Comfort viable</b><span>El sedán abre una categoría de mayor ticket sin brincar al riesgo de Black o SUV premium.</span></div></div>
+            </div>
+          </article>
+          <article class="panel">
+            <h4>Imagen operativa</h4>
+            <p>La unidad debe sentirse suficientemente cómoda para pasajeros corporativos, pero no tan cara que la depreciación, seguro o mantenimiento consuman el negocio.</p>
+            <div class="ios-image-board">
+              <div class="image-card">
+                <svg viewBox="0 0 900 520" role="img" aria-label="Mapa estilizado de Monterrey y zonas de demanda">
+                  <defs>
+                    <linearGradient id="mty" x1="0" x2="1"><stop stop-color="#111827"/><stop offset="1" stop-color="#182033"/></linearGradient>
+                    <radialGradient id="hot" cx="50%" cy="50%" r="50%"><stop stop-color="#4df4a4" stop-opacity=".9"/><stop offset=".55" stop-color="#7fc7ff" stop-opacity=".28"/><stop offset="1" stop-color="#7fc7ff" stop-opacity="0"/></radialGradient>
+                  </defs>
+                  <rect width="900" height="520" rx="34" fill="url(#mty)"/>
+                  <path d="M0 392 C160 300 210 180 352 250 C461 304 521 196 630 190 C749 184 791 280 900 222 L900 520 L0 520Z" fill="rgba(255,255,255,.08)"/>
+                  <path d="M0 368 C158 285 222 154 366 223 C461 269 530 169 629 157 C753 141 801 247 900 190" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="4"/>
+                  <circle cx="570" cy="238" r="145" fill="url(#hot)"><animate attributeName="r" values="126;158;126" dur="4s" repeatCount="indefinite"/></circle>
+                  <circle cx="704" cy="184" r="90" fill="url(#hot)" opacity=".72"><animate attributeName="r" values="74;102;74" dur="4.8s" repeatCount="indefinite"/></circle>
+                  <circle cx="334" cy="328" r="80" fill="url(#hot)" opacity=".58"><animate attributeName="r" values="64;88;64" dur="5.2s" repeatCount="indefinite"/></circle>
+                  <g fill="rgba(255,255,255,.82)" font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-weight="800" font-size="30">
+                    <text x="52" y="70">Monterrey</text>
+                    <text x="532" y="236" font-size="22">San Pedro</text>
+                    <text x="690" y="172" font-size="20">Valle Oriente</text>
+                    <text x="278" y="334" font-size="20">Centro</text>
+                  </g>
+                </svg>
+                <div class="floating-chip">Demanda: Comfort + corporativo</div>
+              </div>
+              <div class="image-stack">
+                <div class="image-card small-img">
+                  <svg viewBox="0 0 500 230" role="img" aria-label="Visual de margen por kilómetro">
+                    <rect width="500" height="230" rx="30" fill="rgba(255,255,255,.04)"/>
+                    <path d="M48 170 C145 98 215 132 272 92 C341 44 390 62 455 38" fill="none" stroke="#4df4a4" stroke-width="16" stroke-linecap="round"/>
+                    <path d="M48 178 C145 120 218 145 282 118 C348 90 392 100 455 78" fill="none" stroke="#7fc7ff" stroke-width="16" stroke-linecap="round" opacity=".55"/>
+                    <circle cx="455" cy="38" r="18" fill="#4df4a4"/>
+                    <text x="35" y="50" fill="white" font-size="24" font-weight="800" font-family="-apple-system, BlinkMacSystemFont, Segoe UI">Margen estable</text>
+                  </svg>
+                  <div class="floating-chip">Costo/km controlado</div>
+                </div>
+                <div class="image-card small-img">
+                  <svg viewBox="0 0 500 230" role="img" aria-label="Visual de riesgo operacional">
+                    <rect width="500" height="230" rx="30" fill="rgba(255,255,255,.04)"/>
+                    <g transform="translate(55 45)">
+                      <circle cx="70" cy="70" r="62" fill="rgba(77,244,164,.18)" stroke="rgba(77,244,164,.7)" stroke-width="8"/>
+                      <path d="M38 74 l22 23 48-58" fill="none" stroke="#4df4a4" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+                    </g>
+                    <text x="190" y="84" fill="white" font-size="28" font-weight="850" font-family="-apple-system, BlinkMacSystemFont, Segoe UI">Riesgo bajo</text>
+                    <text x="190" y="122" fill="rgba(255,255,255,.62)" font-size="18" font-family="-apple-system, BlinkMacSystemFont, Segoe UI">taller + refacciones + reventa</text>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="calculadora">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="kicker">Simulador rápido</div>
+            <h3>Prueba gasolina, kilómetros y años de operación.</h3>
+          </div>
+          <p>Calculadora simple para comparar solo combustible. No sustituye un TCO completo, pero enseña dónde se va el dinero.</p>
+        </div>
+        <div class="panel calc-grid">
+          <div class="controls">
+            <label>Vehículo
+              <select id="carSelect"></select>
+            </label>
+            <label>Kilómetros diarios
+              <input id="dailyKm" type="number" value="300" min="50" max="700" step="10" />
+            </label>
+            <label>Gasolina MXN/litro
+              <input id="fuelPrice" type="number" value="24" min="10" max="45" step=".5" />
+            </label>
+            <label>Años de operación
+              <input id="years" type="number" value="7" min="1" max="10" step="1" />
+            </label>
+          </div>
+          <div>
+            <div class="calc-results">
+              <div class="result-box"><div class="label">Costo combustible / km</div><div class="value" id="costKm">—</div><div class="hint">Solo gasolina. No incluye seguro, llantas, mantenimiento ni depreciación.</div></div>
+              <div class="result-box"><div class="label">Gasto diario</div><div class="value" id="dailyCost">—</div><div class="hint">Con el kilometraje diario indicado.</div></div>
+              <div class="result-box"><div class="label">Gasto anual</div><div class="value" id="annualCost">—</div><div class="hint">Base 365 días para igualar el escenario intensivo.</div></div>
+              <div class="result-box"><div class="label">Gasto total periodo</div><div class="value" id="periodCost">—</div><div class="hint">Combustible acumulado durante los años indicados.</div></div>
+            </div>
+            <p class="fineprint">Tip: cambia entre Corolla HEV, Prius y Ertiga para ver por qué el “hack XL” debe pagar más por viaje: su gasolina es más alta que la de un híbrido Toyota eficiente.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="riesgos">
+      <div class="wrap">
+        <div class="section-head">
+          <div>
+            <div class="kicker">Notas críticas</div>
+            <h3>Reglas que evitan comprar el coche equivocado.</h3>
+          </div>
+          <p>La rentabilidad real se rompe cuando se modelan categorías que la app no habilita o cuando se ignora el costo financiero.</p>
+        </div>
+        <div class="notes">
+          <div class="note"><b>Comfort no es “cualquier auto cómodo”.</b>Uber México publica que Comfort requiere sedán, modelo 2018+, calificación mínima y 100 viajes. Además indica que no admite hatchback.</div>
+          <div class="note"><b>Black no se presume.</b>Para Black, Uber pide que el vehículo esté en la lista permitida del producto y que el socio mantenga calificación mínima. No todo sedán grande entra.</div>
+          <div class="note"><b>XL compite por tarifa, no por consumo.</b>Ertiga y Avanza pueden ser interesantes si la demanda XL existe; si no, se vuelven autos más pesados haciendo UberX.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <div class="kicker">Fuentes y alcance</div>
+      <h3>Modelo visual de decisión, no cotización financiera.</h3>
+      <div class="sources">
+        <a href="https://www.uber.com/mx/es/eligible-vehicles/?city=monterrey" target="_blank" rel="noreferrer">Uber México · Vehículos aptos por ciudad</a>
+        <a href="https://www.uber.com/mx/es/drive/requirements/vehicle-requirements/" target="_blank" rel="noreferrer">Uber México · Requisitos mínimos del vehículo</a>
+        <a href="https://www.uber.com/mx/es/blog/conoce-los-vehiculos-y-requisitos-para-conducir-en-modalidades-distintas-a-uberx/" target="_blank" rel="noreferrer">Uber México · Requisitos de Comfort, Black y otras modalidades</a>
+        <a href="https://www.uber.com/mx/es/drive/services/uberblack/" target="_blank" rel="noreferrer">Uber México · Uber Black</a>
+      </div>
+      <p class="fineprint">Los consumos usados son referencias de ficha, marca o mercado, ajustables desde la calculadora. Antes de comprar, confirma en la app de Uber de Monterrey el modelo exacto, año, versión y categoría habilitada. No incluye impuestos, financiamiento, seguro ERT, gestoría, llantas, suspensión ni días fuera de operación.</p>
+    </div>
+  </footer>
+
+  <script>
+    const cars = [
+      {rank:1, name:'Toyota Corolla HEV', type:'Híbrido sedán', categories:['UberX','Comfort','Bajo riesgo'], note:'Ganador conservador: equilibrio superior entre consumo, Comfort, reventa y confiabilidad.', kmL:23.0, score:93},
+      {rank:2, name:'Toyota Prius HEV', type:'Híbrido', categories:['UberX','Comfort*','Máxima eficiencia'], note:'Excelente ahorro; vigilar elegibilidad Comfort por versión/carrocería y percepción de espacio.', kmL:27.0, score:90},
+      {rank:3, name:'Toyota Camry HEV', type:'Híbrido sedán', categories:['UberX','Comfort','Ejecutivo'], note:'Más cómodo y aspiracional; no modelarlo como Black salvo confirmación exacta en app.', kmL:20.5, score:86},
+      {rank:4, name:'Suzuki Ertiga Boostergreen', type:'Mild hybrid 3 filas', categories:['UberX','XL','Hack tarifa'], note:'Apuesta XL: gana si hay viajes de aeropuerto/familias; no por costo por km puro.', kmL:18.3, score:84},
+      {rank:5, name:'Toyota Avanza', type:'Gasolina 3 filas', categories:['UberX','XL','Confiable'], note:'XL económico y robusto; mayor consumo y menor refinamiento que un sedán híbrido.', kmL:14.5, score:80},
+      {rank:6, name:'Nissan Kicks e-POWER', type:'Híbrido serial', categories:['UberX','Comfort?','Urbano'], note:'Eficiente en ciudad; confirmar Comfort y considerar costo inicial/reventa.', kmL:21.7, score:79},
+      {rank:7, name:'Hyundai Elantra HEV', type:'Híbrido sedán', categories:['UberX','Comfort','Buen equipo'], note:'Buen producto; reventa y red Toyota siguen pesando contra él.', kmL:22.0, score:77},
+      {rank:8, name:'BYD King DM-i', type:'PHEV / híbrido enchufable', categories:['UberX','Comfort?','Nuevo jugador'], note:'Muy prometedor; más incertidumbre por historial, reventa y elegibilidad exacta.', kmL:24.0, score:76},
+      {rank:9, name:'MG 3 Hybrid+', type:'Híbrido hatchback', categories:['UberX','No Comfort'], note:'Eficiente y barato, pero hatchback: no conviene modelarlo como Comfort.', kmL:22.0, score:71},
+      {rank:10, name:'Mitsubishi Mirage G4', type:'Gasolina sedán', categories:['UberX','Entrada'], note:'Ahorrador y simple, pero menor comodidad y categoría limitada.', kmL:18.0, score:67},
+      {rank:11, name:'Hyundai Grand i10 Sedán', type:'Gasolina sedán', categories:['UberX','Entrada'], note:'Bajo costo inicial; útil si el presupuesto manda, no si buscas máximo ROI de largo plazo.', kmL:17.0, score:65},
+      {rank:12, name:'Dodge Attitude', type:'Gasolina sedán', categories:['UberX','Entrada'], note:'Compra accesible; el margen se puede erosionar por combustible y depreciación.', kmL:18.0, score:63}
+    ];
+
+    const peso = new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:0});
+    const peso2 = new Intl.NumberFormat('es-MX',{style:'currency',currency:'MXN',maximumFractionDigits:2});
+
+    const rows = document.getElementById('rankingRows');
+    rows.innerHTML = cars.map(car => `
+      <article class="rank-row ${car.rank===1?'top':''}">
+        <div class="num">${car.rank}</div>
+        <div>
+          <div class="car-name">${car.name}</div>
+          <div class="car-note">${car.type} · ${car.note}</div>
+        </div>
+        <div class="tags">${car.categories.map((c,i)=>`<span class="tag ${car.rank===1 && i===1?'hot':''}">${c}</span>`).join('')}</div>
+        <div class="bar" aria-label="Puntaje ${car.score}"><span style="--w:${car.score}%"></span></div>
+        <div class="score">${car.score}<small>score</small></div>
+      </article>
+    `).join('');
+
+    const select = document.getElementById('carSelect');
+    select.innerHTML = cars.map((car, i)=>`<option value="${i}">${car.name} · ${car.kmL} km/l</option>`).join('');
+
+    function calc(){
+      const car = cars[+select.value];
+      const dailyKm = Math.max(0, +document.getElementById('dailyKm').value || 0);
+      const fuelPrice = Math.max(0, +document.getElementById('fuelPrice').value || 0);
+      const years = Math.max(0, +document.getElementById('years').value || 0);
+      const costKm = fuelPrice / car.kmL;
+      const daily = costKm * dailyKm;
+      const annual = daily * 365;
+      const total = annual * years;
+      document.getElementById('costKm').textContent = peso2.format(costKm);
+      document.getElementById('dailyCost').textContent = peso.format(daily);
+      document.getElementById('annualCost').textContent = peso.format(annual);
+      document.getElementById('periodCost').textContent = peso.format(total);
+    }
+    ['carSelect','dailyKm','fuelPrice','years'].forEach(id=>document.getElementById(id).addEventListener('input', calc));
+    calc();
+
+    const observer = new IntersectionObserver((entries)=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.classList.add('reveal');
+          observer.unobserve(entry.target);
+        }
+      });
+    },{threshold:.14});
+    document.querySelectorAll('.card,.rank-row').forEach((el,i)=>{
+      el.style.transitionDelay = `${Math.min(i*55, 440)}ms`;
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
