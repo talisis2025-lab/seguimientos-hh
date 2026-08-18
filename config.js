@@ -1,5 +1,5 @@
-// Opcional: pega aquí la URL de Apps Script para que quede incluida en GitHub.
-// También puedes configurarla desde el engrane de la página; se guardará en tu navegador.
+// Pega aquí la URL /exec de la NUEVA implementación de Apps Script.
+// No reutilices la implementación de la página individual anterior.
 window.APP_CONFIG = {
   API_URL: ""
 };

@@ -1,45 +1,65 @@
-# Seguimiento de Prospectos
+# Seguimiento de Prospectos · Multiusuario
 
-Página estática para registrar y dar seguimiento a prospectos. Funciona en GitHub Pages y utiliza Google Sheets como base de datos mediante Google Apps Script.
+Versión independiente para un equipo de orientadores. Cada persona inicia sesión con un código temporal enviado a su correo y solamente puede consultar o modificar sus propios prospectos. El administrador configurado es `abraham.quintero@unid.mx`.
 
-## Funciones
+## Qué incluye
 
-- Programas: Presencial, Virtual y Licenciamiento.
-- Fecha de contacto predeterminada al día actual.
-- Próximo contacto opcional con fecha, hora y medio: llamada o WhatsApp.
-- Semáforo automático: verde (0–2 días), azul (contacto programado para hoy), amarillo (3 días) y rojo (4 días o más). El domingo no aumenta el contador.
-- Resumen por correo de lunes a sábado y recordatorio individual cerca de la hora programada.
-- Botón **Contacté hoy** para reiniciar el seguimiento.
-- Edición completa de los datos del prospecto desde la página.
-- Una cita programada que no se confirma pasa automáticamente a **Urgente** al día siguiente; el domingo no cuenta.
-- Eliminación automática 30 días después de la actividad más reciente entre registro, último contacto y próximo contacto programado.
-- Búsqueda, filtros y diseño adaptable a celular.
+- Registro libre con correos de Outlook, Gmail u otros dominios.
+- Código de acceso de seis dígitos con vigencia de 10 minutos.
+- Sesión de ocho horas; cerrar o perder la sesión no elimina prospectos.
+- Propiedad de cada lead asignada exclusivamente por Apps Script.
+- Los orientadores solamente reciben y modifican sus propios registros.
+- El administrador puede ver, editar y eliminar todos los prospectos.
+- Correos de seguimiento y recordatorios enviados al propietario correspondiente.
+- Sin eliminación automática: los leads permanecen indefinidamente.
+- Domingos excluidos del contador y de los envíos.
+- Edición de prospectos, búsqueda, filtros y citas vencidas en estado urgente.
 
-## 1. Preparar Google Sheets
+## 1. Crear una base separada
 
-1. Crea una hoja nueva en [Google Sheets](https://sheets.google.com) y ponle el nombre que prefieras.
-2. En la hoja abre **Extensiones → Apps Script**.
-3. Borra el contenido inicial del editor y pega todo el contenido de `apps-script/Code.gs`.
-4. En Apps Script abre **Configuración del proyecto** y establece la zona horaria de tu operación (por ejemplo, `America/Monterrey`).
-5. Guarda el proyecto.
-6. Pulsa **Implementar → Nueva implementación**.
-7. En tipo selecciona **Aplicación web**.
-8. Configura **Ejecutar como: Yo** y **Quién tiene acceso: Cualquier persona**.
-9. Pulsa **Implementar**, autoriza el acceso y copia la URL terminada en `/exec`.
+Para no afectar el sistema actual, crea una hoja de cálculo nueva.
 
-La pestaña `Prospectos` y sus encabezados se crean automáticamente al registrar o consultar por primera vez.
+1. Abre Google Sheets y crea una hoja vacía.
+2. Ponle un nombre identificable, por ejemplo `Seguimientos multiusuario`.
+3. Abre **Extensiones → Apps Script**.
+4. Borra el contenido inicial y pega todo `apps-script/Code.gs`.
+5. En las primeras líneas cambia `PAGE_URL` cuando conozcas la dirección del nuevo repositorio:
 
-## 2. Conectar la página
+```js
+const ADMIN_EMAIL = 'abraham.quintero@unid.mx';
+const PAGE_URL = 'https://TU-USUARIO.github.io/TU-REPOSITORIO/';
+```
 
-Hay dos opciones:
+6. En **Configuración del proyecto**, establece la zona horaria `America/Monterrey`.
+7. Guarda el proyecto.
 
-### Sin editar código
+Las pestañas `Prospectos`, `Orientadores` y `Sesiones` se crean automáticamente. `Sesiones` queda oculta para evitar modificaciones accidentales.
 
-Abre la página, pulsa el engrane, pega la URL `/exec` y guarda. La dirección queda almacenada en ese navegador.
+## 2. Publicar Apps Script
 
-### Conexión predeterminada para todos
+1. Pulsa **Implementar → Nueva implementación**.
+2. Selecciona **Aplicación web**.
+3. Configura **Ejecutar como: Yo**.
+4. Configura **Quién tiene acceso: Cualquier persona**.
+5. Pulsa **Implementar** y acepta los permisos.
+6. Copia la URL terminada en `/exec`.
 
-Abre `config.js` y pega la URL:
+La aplicación web es pública para permitir el envío del código, pero las operaciones de prospectos exigen una sesión válida y Apps Script comprueba al propietario en cada consulta, modificación o eliminación.
+
+## 3. Configurar correos automáticos
+
+Dentro de Apps Script:
+
+1. Selecciona `sendTestNotification` y pulsa **Ejecutar**.
+2. Confirma que la prueba llegó a `abraham.quintero@unid.mx`.
+3. Selecciona `installDailyNotification` y ejecútala una vez.
+4. En **Activadores** deben aparecer `sendDailyFollowUpNotification` y `sendScheduledContactReminders`.
+
+Los correos de acceso y recordatorios salen desde la cuenta de Google propietaria del Apps Script. La dirección de Outlook únicamente necesita poder recibirlos.
+
+## 4. Conectar y publicar el nuevo repositorio
+
+1. Pega la nueva URL `/exec` en `config.js`:
 
 ```js
 window.APP_CONFIG = {
@@ -47,41 +67,60 @@ window.APP_CONFIG = {
 };
 ```
 
-Esta URL no es una contraseña, pero cualquier persona que la tenga podrá usar el formulario. Para uso público con datos sensibles conviene agregar autenticación antes de compartirlo ampliamente.
+2. Crea un repositorio nuevo en GitHub.
+3. Sube todos los archivos de esta carpeta a la raíz.
+4. En GitHub abre **Settings → Pages**.
+5. Elige **Deploy from a branch**, rama `main`, carpeta `/ (root)`.
+6. Cuando GitHub entregue la URL, colócala en `PAGE_URL` de Apps Script.
+7. Guarda y actualiza la implementación: **Implementar → Administrar implementaciones → Editar → Nueva versión → Implementar**.
 
-## 3. Publicar en GitHub Pages
+## Administración desde Sheets
 
-1. Crea un repositorio nuevo en GitHub.
-2. Sube el contenido de esta carpeta a la raíz del repositorio.
-3. En GitHub abre **Settings → Pages**.
-4. En **Build and deployment** elige **Deploy from a branch**.
-5. Selecciona la rama `main`, carpeta `/ (root)` y guarda.
-6. GitHub mostrará la URL pública cuando termine la publicación.
+La pestaña `Orientadores` contiene:
 
-## Regla de eliminación mensual
+| Columna | Uso |
+|---|---|
+| `id` | Identidad interna que vincula los prospectos |
+| `name` | Nombre del orientador |
+| `email` | Correo utilizado para el acceso y las alertas |
+| `role` | Administrador u Orientador |
+| `active` | `Sí` permite acceso; `No` lo bloquea |
+| `lastLoginAt` | Último acceso confirmado |
 
-`RETENTION_DAYS = 30` en `apps-script/Code.gs` controla la retención. La limpieza se ejecuta cada vez que la página consulta o modifica datos y toma como referencia la fecha más reciente entre el registro, el último contacto y el próximo contacto programado. Por ejemplo, si una cita está programada para dentro de 20 días, el prospecto se conservará hasta 30 días después de esa cita. Al pulsar **Contacté hoy**, la retención vuelve a comenzar desde hoy. Para conservar 60 días, cambia el valor a `60` y crea una nueva versión de la implementación en Apps Script.
+### Bloquear a una persona
 
-## Actualizar Apps Script
+Cambia `active` a `No`. La siguiente operación invalida su sesión y deja de recibir alertas. Sus leads permanecen guardados.
 
-Después de cambiar `Code.gs`, abre **Implementar → Administrar implementaciones → Editar**, elige **Nueva versión** y pulsa **Implementar**. La URL `/exec` seguirá siendo la misma.
+### Eliminar a una persona
 
-## Nota sobre GitHub Pages y Apps Script
+Elimina su fila de `Orientadores`. Su sesión deja de funcionar y sus leads quedan sin una cuenta activa. Como el registro es libre, ese mismo correo podrá crear una cuenta nueva, pero recibirá un ID nuevo y no recuperará automáticamente los leads anteriores.
 
-La página usa JSONP para consultar, registrar y actualizar los datos. Esto evita el bloqueo `Failed to fetch` que producen las redirecciones de Apps Script cuando se consumen directamente desde un dominio de GitHub Pages.
+Para bloquear el correo de forma permanente, conserva la fila y utiliza `active = No`.
 
-## Notificaciones por correo de Outlook
+### Reasignar leads manualmente
 
-Apps Script puede enviar el resumen a cualquier correo, incluyendo Outlook empresarial. El remitente será la cuenta de Google que ejecuta Apps Script y el destinatario se configura en `NOTIFICATION_EMAIL`, al inicio de `Code.gs`.
+Como administrador puedes copiar en `Prospectos` el `id`, nombre y correo del nuevo orientador en las columnas `ownerId`, `ownerName` y `ownerEmail`. El acceso de la aplicación siempre se decide con `ownerId`.
 
-1. Cambia `TU_CORREO_LABORAL@EMPRESA.COM` por tu correo real.
-2. Guarda `Code.gs`.
-3. Ejecuta manualmente `sendDiagnosticNotification` y autoriza el acceso a Gmail.
-4. Confirma que el mensaje llegó a Outlook; revisa también Correo no deseado.
-5. Ejecuta una vez `installDailyNotification`. Recibirás un correo de confirmación.
+## Reglas de privacidad
 
-El resumen se envía de lunes a sábado cerca de las 8:30 a. m., incluso cuando no hay vencidos. Los domingos no se envía y tampoco aumentan el contador de días. Un segundo activador revisa cada 5 minutos los contactos con fecha y hora; al llegar la hora, envía una sola alerta indicando si corresponde llamada o WhatsApp.
+- El navegador nunca decide quién es propietario de un prospecto.
+- Apps Script obtiene el propietario desde la sesión.
+- Un orientador no puede listar, editar, contactar ni eliminar leads ajenos.
+- El administrador es reconocido exclusivamente por el correo configurado en `ADMIN_EMAIL`.
+- Las sesiones se almacenan como hashes, no como tokens legibles.
+- Los códigos temporales no se guardan en Sheets.
 
-Después de actualizar `Code.gs`, vuelve a ejecutar `installDailyNotification` para reemplazar el activador anterior. En el panel **Activadores** deben aparecer `sendDailyFollowUpNotification` y `sendScheduledContactReminders`.
+## Límites de códigos
 
-La función `sendDiagnosticNotification` genera un correo de texto simple y lo deja visible en Enviados de Gmail. Si aparece en Enviados pero Outlook no lo recibe, el administrador de Microsoft 365 debe revisar la cuarentena o el rastreo del mensaje usando el asunto y el remitente visibles.
+Para reducir abusos y proteger la cuota de Gmail:
+
+- Un código por minuto por correo.
+- Cinco solicitudes diarias por correo.
+- Cien solicitudes diarias en total.
+- Cinco intentos por código.
+
+Estos valores pueden cambiarse al inicio de `Code.gs`.
+
+## Actualizaciones posteriores
+
+Después de modificar `Code.gs`, guarda y crea una **Nueva versión** de la implementación. La URL `/exec` seguirá siendo la misma. Los cambios de `index.html`, `app.js` o `styles.css` deben subirse al repositorio nuevo de GitHub.
